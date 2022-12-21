@@ -1,0 +1,27 @@
+body {
+    font-size: 48px;
+    background-image: url(../imgs/giphy-4.gif);
+    color: aliceblue;
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+
+div{
+  text-align: center; 
+  font-family: 'PICKSUHL', sans-serif;
+}
+
+#missile {position:absolute;bottom:10px;
+        left:300px; height:70px;}
+
+#ufo { position:absolute;bottom:375px;left:0px;}
+
+.setOfUfos{ position:absolute;bottom:500px;left:0px;width:60px} 
+
+#info_points {position:absolute;bottom: 30px;
+                right:30px;width:150px;height:50px;
+                color:white; text-align:center; font-size:18pt; padding-top:20px} 
+
+#info_time {position:absolute;bottom:30px;
+                left:30px;width:150px;height:50px;
+                 color:white; text-align:center; font-size:18pt; padding-top:20px} 

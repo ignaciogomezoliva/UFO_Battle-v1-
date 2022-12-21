@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+  <head> 
+    <title>LOGIN</title>
+    <link href="css/styles.css" rel="stylesheet" type="text/css">
+    <link href="http://fonts.cdnfonts.com/css/picksuhl" rel="stylesheet">
+  </head>
+  <body>
+
+    <div class="header">
+      <h1>LOGIN</h1>
+    </div>
+
+    <ul>
+      <li><a href="home.html">Home</a></li>
+      <li><a href="preferences.html">Preferences</a></li>
+      <li><a href="records.html">Records</a></li>
+    </ul>
+    <br>
+    <div>
+        <form action="">
+            <label for="user">Username: </label>
+            <input type="text" id="username" required><br>
+            <label for="password">Password: </label>
+            <input type="password" id="pass" required><br>
+        </form>
+        <br>
+        <button id="accept" class="button-33">Accept</button>
+    </div>
+    
+
+  </body>
+
+  <script type="text/javascript">
+    window.onload = function () {
+        document.getElementById("accept").onclick = function () {
+          loginRequest();
+        }
+    }
+
+    var http_request = new XMLHttpRequest(), url = "http://wd.etsisi.upm.es:10000/users/login?";  
+    
+    function loginRequest(){
+        var user = document.getElementById("username").value, pass = document.getElementById("pass").value;
+        url = url + "username=" + user + "&password=" + pass;
+        sessionStorage.setItem("username", user);
+        http_request.open("GET", url, true); 
+        http_request.responseType = 'json'; 
+        http_request.onload = responseProcess; 
+        http_request.send();
+    }
+
+    function responseProcess() { 
+        var aresponse;
+        if (http_request.status == 200){
+            aresponse = http_request.getResponseHeader("Authorization");
+            sessionStorage.setItem("token", aresponse);
+            sessionStorage.setItem("logged", true);
+            alert("Login succesful!");
+            window.location.replace("home.html");
+        }
+        else
+            alert("ATTENTION: Error on login.");
+    }
+  </script>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+  <head> 
+    <title>RECORDS</title>
+    <link href="css/styles.css" rel="stylesheet" type="text/css">
+    <link href="http://fonts.cdnfonts.com/css/picksuhl" rel="stylesheet">
+  </head>
+  <body>
+
+    <div class="header">
+      <h1>RECORDS</h1>
+    </div>
+
+    <ul style="text-align: center; width: fit-content; font-family: 'PICKSUHL', sans-serif;">
+      <li><a href="home.html">Home</a></li>
+      <li><a href="preferences.html">Preferences</a></li>
+      <li><a href="records.html">Records</a></li>
+    </ul>
+
+    <br>
+
+    <table id="records">
+        <tr id="top-row">
+            <th></th>
+            <th>User</th>
+            <th>Points</th>
+            <th>UFOs</th>
+            <th>Secs</th>
+            <th>Date</th>
+        </tr>
+    </table>
+
+  </body>
+
+  <script type="text/javascript">
+     window.onload = function () {
+        loginRequest();
+    }
+    
+    var http_request = new XMLHttpRequest(), url = "http://wd.etsisi.upm.es:10000/records";  
+
+    function loginRequest(){
+        http_request.open("GET", url, true); 
+        http_request.responseType = 'json'; 
+        http_request.onload = responseProcess; 
+        http_request.send();
+    }
+
+    function padTo2Digits(num) {
+        return num.toString().padStart(2, '0');
+        }
+
+    function formatDate(date) {
+        return [
+            padTo2Digits(date.getDate()),
+            padTo2Digits(date.getMonth() + 1),
+            date.getFullYear(),
+        ].join('/');
+    }
+
+    function responseProcess() { 
+        var aresponse, index = 1;
+        if (http_request.status == 200){
+            aresponse = http_request.response; 
+            var list = document.getElementById("records");
+            list.innerHTML = list.innerHTML + 
+                             aresponse.map(e => `<tr>
+                                                    <th>${index++}.</th>
+                                                    <th>${e.username}</th>
+                                                    <th>${e.punctuation}</th>
+                                                    <th>${e.ufos}</th>
+                                                    <th>${e.disposedTime}</th>
+                                                    <th>${formatDate(new Date(e.recordDate))}</th>
+                                                </tr>`)
+                                       .join("");
+        }
+        else
+            alert("ATTENTION: Error on loading records.");
+    }
+  </script>
+</html>

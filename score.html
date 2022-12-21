@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>UFO BATTLE</title>
+    <link href="css/styles.css" rel="stylesheet" type="text/css">
+    <link href="http://fonts.cdnfonts.com/css/picksuhl" rel="stylesheet">
+  </head>
+  <body>
+
+    <div class="header">
+      <h1>TIME'S UP!</h1>
+    </div>
+
+    <ul>
+      <li><a href="home.html">Home</a></li>
+      <li><a href="preferences.html">Preferences</a></li>
+      <li><a href="records.html">Records</a></li>
+    </ul>
+
+    <div style="width: 1100px;">
+        <h2>FINAL SCORE:</h2>
+        <p id="penalty1">0</p>
+        <p id="penalty2">0</p>
+        <h1 id="total"></h1>
+    </div>
+
+
+  <script type="text/javascript">
+    window.onload = function () {
+        let aux = sessionStorage.getItem("number"),
+            penalty1, penalty2;
+        
+        penalty1 = sessionStorage.getItem("time") / 60;
+
+        if (aux === "1")
+            penalty2 = 0;
+        else
+            penalty2 = (aux-1) * 50;
+        
+        let calc = sessionStorage.getItem("score") / penalty1 - penalty2;
+
+        document.getElementById("penalty1").innerHTML = "Time penalty: 1/" + penalty1;
+        document.getElementById("penalty2").innerHTML = "# UFO penaly: - " + penalty2 + " points";
+        document.getElementById("total").innerHTML = "Total: " + calc + " points";
+
+        sessionStorage.setItem("score", calc);
+        loginRequest();
+        }
+
+        var http_request = new XMLHttpRequest(), url = "http://wd.etsisi.upm.es:10000/records?";  
+
+        function loginRequest(){
+          if(sessionStorage.getItem("logged")) {
+            var punctuation = sessionStorage.getItem("score"), ufos = sessionStorage.getItem("number"), disposedTime = sessionStorage.getItem("time");
+            var params = "punctuation=" + punctuation + "&ufos=" + ufos + "&disposedTime=" + disposedTime;
+
+            http_request.open("POST", url, true); 
+            http_request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+            http_request.setRequestHeader('Authorization', sessionStorage.getItem("token"));
+
+            http_request.responseType = 'json'; 
+            http_request.onload = responseProcess; 
+            http_request.send(params);
+          }
+        }
+
+        function responseProcess() { 
+            var aresponse;
+            if (http_request.status == 201){
+                alert("Score stored properly!");
+            }
+            else
+                alert("ATTENTION: Error storing score");
+            }
+
+  </script>
+</html>

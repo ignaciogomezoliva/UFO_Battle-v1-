@@ -1,0 +1,251 @@
+<!DOCTYPE HTML>
+<html>
+    <head><title>Destroy them all!</title>
+        <link href="css/playStyles.css" rel="stylesheet" type="text/css">
+        <link href="http://fonts.cdnfonts.com/css/picksuhl" rel="stylesheet">
+    </head>
+    <body>
+        <script type='text/javascript'>
+
+        var pid, score = 0, seconds = 0,
+            themissile, launchedMissile = false, index=0;
+        var setOfUfos = [];
+
+        function UFO(ident){
+            this.identifier = ident;
+            this.move = fMove;
+            this.width = parseInt(document.getElementById(this.identifier).style.width);
+            this.hstep = 5;         
+            }
+
+        function fMove(){ 
+            let element = document.getElementById(this.identifier),
+                hpos = parseInt(element.style.left),
+                rightlimit = window.innerWidth,
+                leftlimit = 0;
+            if ((hpos+ this.width) > rightlimit)
+                this.hstep = -this.hstep; 
+            if (hpos < leftlimit )
+                this.hstep = -this.hstep;   
+            hpos = (hpos + this.hstep) + "px";
+            element.style.left = hpos;              
+            }
+
+
+        function newImage(){
+            let rLimit = window.innerWidth - 90, //ancho de la nave
+                uLimit = window.innerHeight - 90, //altura de la nave
+                newleft = parseInt(Math.random()*rLimit),
+                newbottom = parseInt(Math.random()*(uLimit - 100) + 100); //Limites arriba y abajo
+                 
+            newelement = document.createElement('img');
+            
+            newelement.setAttribute("id", "UFO" + index);
+            let id = "UFO" + index;
+            index++;
+            newelement.setAttribute('src', 'imgs/ufo.png');
+            newelement.setAttribute('class', 'setOfUfos');
+            newelement.setAttribute("style", "left:0px;width:90px");
+            document.getElementById("container").appendChild(newelement);
+            newelement.style.left = newleft+'px';
+            newelement.style.bottom =  newbottom+'px';
+        }
+
+        function pullTrigger(){
+            if(!launchedMissile){
+                launchedMissile = true;
+                pid = setInterval(launch, 10);
+            }
+        }
+        
+        function checkforaHit(){
+            var hit = "";
+            setOfUfos.forEach(element => {
+                let theufo = document.getElementById(element);
+                let hpos_ufo = parseInt(theufo.style.left),
+                    vpos_ufo = parseInt(theufo.style.bottom),
+                    width_ufo = parseInt(theufo.style.width),
+                    vpos_m = parseInt(themissile.style.bottom),
+                    hpos_m = parseInt(themissile.style.left),
+                    width_m = parseInt(themissile.style.width),
+                    height_m = parseInt(themissile.style.height);
+                
+                if((vpos_m + height_m >= vpos_ufo) &&
+                   (hpos_m >= hpos_ufo) &&
+                   (hpos_m <= hpos_ufo + width_ufo)){
+                        hit = element;
+                    }
+            });
+            return hit;
+        }
+        
+        function launch(){
+            var uLimit = window.innerHeight,
+                vpos_m,
+                vstep = 10;
+            var aux = checkforaHit();
+            if (aux != ""){  
+                themissile.style.bottom = "0px";
+                clearInterval(pid);
+                launchedMissile = false;
+                score += 100;
+                document.getElementById("points").innerHTML = score;
+                theufo = document.getElementById(aux);
+                theufo.src="imgs/explosion.gif"
+                setTimeout( () => {theufo.src = "imgs/ufo.png"}, 500)
+                }        
+
+            vpos_m = parseInt(themissile.style.bottom);
+
+            if(vpos_m < uLimit) {
+                vpos_m += vstep;
+                vpos_m = vpos_m + "px";
+                themissile.style.bottom = vpos_m; 
+            } else {
+                themissile.style.bottom = "0px";
+                clearInterval(pid);
+                launchedMissile = false;
+                score -= 25;
+                document.getElementById("points").innerHTML = score;
+            }
+        
+        }  
+
+        function moveMissileRight(){
+            var rLimit = window.innerWidth, 
+                hpos_m, misWidth, hstep = 10;
+
+            misWidth = parseInt(themissile.style.width);
+            hpos_m = parseInt(themissile.style.left);
+
+            if (hpos_m + misWidth < rLimit){
+                hpos_m += hstep;
+                themissile.style.left = (hpos_m + "px");
+            } 
+        }
+
+        function moveMissileLeft(){  
+            var hpos_m, hstep = 5,
+                misWidth = parseInt(themissile.style.width),
+                hpos_m = parseInt(themissile.style.left);
+
+            if (hpos_m > 0){
+                hpos_m -= hstep;
+                themissile.style.left = (hpos_m + "px");
+            } 
+        }  
+        
+        function keyboardController (theEvent){
+            let interval = 15;    
+            let code;
+            code = theEvent.key;
+            switch (code){
+                case 'ArrowRight':  moveMissileRight();
+                                    break;
+                case 'ArrowLeft':   moveMissileLeft();      
+                                    break;
+                case ' '         :  pullTrigger();
+                                    break;
+            }
+        }
+
+        function countTime(){
+            seconds -=1;
+            document.getElementById("time").innerHTML = seconds;
+            if (seconds === 0) {
+                sessionStorage.setItem("score", score);
+                window.location.replace("score.html");
+            }
+                
+        }
+        
+        window.onload = function(){
+            seconds = sessionStorage.getItem("time");
+            document.getElementById("time").innerHTML = seconds;
+            setInterval("countTime()", 1000);
+            let n = sessionStorage.getItem("number");
+            switch (n) {
+                case "1":
+                    newImage();
+                    setOfUfos.push("UFO0");
+                    ufo0 = new UFO("UFO0");
+                    setInterval("ufo0.move()", 25);
+                    break;
+
+                case "2":
+                    newImage();
+                    newImage();
+                    setOfUfos.push("UFO0", "UFO1");
+                    ufo0 = new UFO("UFO0");
+                    ufo1 = new UFO("UFO1");
+                    setInterval("ufo0.move()", 25);
+                    setInterval("ufo1.move()", 25);
+                    break;
+
+                case "3":
+                    newImage();
+                    newImage();
+                    newImage();
+                    setOfUfos.push("UFO0", "UFO1", "UFO2");
+                    ufo0 = new UFO("UFO0");
+                    ufo1 = new UFO("UFO1");
+                    ufo2 = new UFO("UFO2");
+                    setInterval("ufo0.move()", 25);
+                    setInterval("ufo1.move()", 25);
+                    setInterval("ufo2.move()", 25);
+                    break;
+
+                case "4":
+                    newImage();
+                    newImage();
+                    newImage();
+                    newImage();
+                    setOfUfos.push("UFO0", "UFO1", "UFO2", "UFO3");
+                    ufo0 = new UFO("UFO0");
+                    ufo1 = new UFO("UFO1");
+                    ufo2 = new UFO("UFO2");
+                    ufo3 = new UFO("UFO3");
+                    setInterval("ufo0.move()", 25);
+                    setInterval("ufo1.move()", 25);
+                    setInterval("ufo2.move()", 25);
+                    setInterval("ufo3.move()", 25);
+                    break;
+
+                case "5":
+                    newImage();
+                    newImage();
+                    newImage();
+                    newImage();
+                    newImage();
+                    setOfUfos.push("UFO0", "UFO1", "UFO2", "UFO3", "UFO4");
+                    ufo0 = new UFO("UFO0");
+                    ufo1 = new UFO("UFO1");
+                    ufo2 = new UFO("UFO2");
+                    ufo3 = new UFO("UFO3");
+                    ufo4 = new UFO("UFO4");
+                    setInterval("ufo0.move()", 25);
+                    setInterval("ufo1.move()", 25);
+                    setInterval("ufo2.move()", 25);
+                    setInterval("ufo3.move()", 25);
+                    setInterval("ufo4.move()", 25);
+                    break;
+            }
+
+            themissile = document.getElementById('missile');
+            document.onkeydown = keyboardController;
+        }
+        
+    </script>
+    
+    <img id='missile' src='imgs/missile.png' STYLE="left:300px;bottom:10px;height:70px;width:40px;z-index: 1;"/>
+    <div id='container' class="container"></div>
+    <div id='info_points' style="z-index: 0">
+        SCORE:
+        <p id="points">0</p>
+    </div>
+    <div id="info_time">
+        TIME LEFT:
+        <p id="time" style="z-index: 0">0</p>
+    </div>           
+    </body>
+</html>
